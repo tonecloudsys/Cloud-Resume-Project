@@ -10,8 +10,14 @@ resource "aws_s3_bucket" "site" {
         Name       = "Tone bucket"
     }
 }
-resource "aws_s3_bucket_public_access_block" "public-access" {
-    bucket = "my-tf-tdh-resume-bucket"
+resource "aws_s3_bucket_ownership_controls" "site" {
+    bucket = aws_s3_bucket.site.id
+    rule {
+        object_ownership = "BucketOwnerPreferred"
+    }
+}
+resource "aws_s3_bucket_public_access_block" "site" {
+    bucket = aws_s3_bucket.site.id
 
     block_public_acls =         false
     block_public_policy =       false
@@ -21,16 +27,20 @@ resource "aws_s3_bucket_public_access_block" "public-access" {
 }
 
 resource "aws_s3_bucket_website_configuration" "site" {
-    bucket = "my-tf-tdh-resume-bucket"
+    bucket = aws_s3_bucket.site.id
 
     index_document {
         suffix = "index-html"
     }
 
 }
-resource "aws_s3_bucket_acl" "site-acl" {
-    bucket = "my-tf-tdh-resume-bucket"
+resource "aws_s3_bucket_acl" "site" {
+    depends_on = [
+        aws_s3_bucket_ownership_controls.site,
+        aws_s3_bucket_public_access_block.site,
+        
+    ]
 
-    acl    = "public-read"
-  
+    bucket = aws_s3_bucket.site.id
+    acl    = "public-read" 
 }
