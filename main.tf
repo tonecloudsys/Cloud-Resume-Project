@@ -30,7 +30,7 @@ resource "aws_s3_bucket_website_configuration" "site" {
     bucket = aws_s3_bucket.site.id
 
     index_document {
-        suffix = "index-html"
+        suffix = "index.html"
     }
 
 }
@@ -43,4 +43,11 @@ resource "aws_s3_bucket_acl" "site" {
 
     bucket = aws_s3_bucket.site.id
     acl    = "public-read" 
+}
+resource "aws_s3_object" "object" {
+    bucket = aws_s3_bucket.site.id
+    key    = "index.html"
+    acl    = "public-read"
+    source = "C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html"
+    etag = filemd5("C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html")
 }
