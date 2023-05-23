@@ -10,17 +10,27 @@ resource "aws_s3_bucket" "site" {
         Name       = "Tone bucket"
     }
 }
+resource "aws_s3_bucket_public_access_block" "public-access" {
+    bucket = "my-tf-tdh-resume-bucket"
+
+    block_public_acls =         false
+    block_public_policy =       false
+    ignore_public_acls =        false
+    restrict_public_buckets =   false
+    
+}
+
 resource "aws_s3_bucket_website_configuration" "site" {
-    bucket = aws_s3_bucket.site.id
+    bucket = "my-tf-tdh-resume-bucket"
 
     index_document {
-        suffix = "index.html"
+        suffix = "index-html"
     }
 
 }
-resource "aws_s3_bucket_acl" "site" {
-    bucket = aws_s3_bucket.site.id
+resource "aws_s3_bucket_acl" "site-acl" {
+    bucket = "my-tf-tdh-resume-bucket"
 
-    acl = "public-read"
+    acl    = "public-read"
   
 }
