@@ -13,15 +13,15 @@ resource "aws_s3_bucket" "site" {
 resource "aws_s3_bucket_ownership_controls" "site" {
     bucket = aws_s3_bucket.site.id
     rule {
-        object_ownership = "BucketOwnerPreferred"
+        object_ownership         = "BucketOwnerPreferred"
     }
 }
 resource "aws_s3_bucket_public_access_block" "site" {
     bucket = aws_s3_bucket.site.id
 
-    block_public_acls =         false
-    block_public_policy =       false
-    ignore_public_acls =        false
+    block_public_acls       =         false
+    block_public_policy     =       false
+    ignore_public_acls      =        false
     restrict_public_buckets =   false
     
 }
@@ -44,10 +44,14 @@ resource "aws_s3_bucket_acl" "site" {
     bucket = aws_s3_bucket.site.id
     acl    = "public-read" 
 }
-resource "aws_s3_object" "object" {
-    bucket = aws_s3_bucket.site.id
-    key    = "index.html"
-    acl    = "public-read"
-    source = "C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html"
-    etag = filemd5("C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html")
+resource "aws_s3_object" "site" {
+    depends_on = [
+        aws_s3_bucket_acl.site
+    ]
+    bucket       = aws_s3_bucket.site.id
+    key          = "index.html"
+    content_type = "text/html"
+    acl          = "public-read"
+    source       = "C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html"
+    etag         = filemd5("C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html")
 }
