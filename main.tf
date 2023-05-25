@@ -82,11 +82,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     comment = "Some comment"
     default_root_object = "index.html"
 
-    logging_config {
-        include_cookies = false
-        bucket = "tdh-cloudfront-logs"
-        prefix = "logs/"
-    }
 
     default_cache_behavior {
         allowed_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -99,8 +94,18 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
         max_ttl                = 86400
 
 
-    }
+    
+    forwarded_values {
+        query_string = false
+        headers      = ["Origin"]
 
+        cookies {
+            forward = "none"
+        }
+    }
+    
+    }
+    
 
     restrictions {
         geo_restriction {
