@@ -1,6 +1,22 @@
+terraform {
+    required_providers {
+    aws = {
+    source = "hashicorp/aws"
+    version = "~> 5.0.1"
+    }
+    }
+}
+
+# Configure the AWS Provider
 provider "aws" {
     region  =  "us-east-1"
     profile = "tone.herndon.adm"
+}
+
+provider "aws" {
+    alias = "acm"
+    region = "us-east-1"
+    version = "2.11.18"
 }
 
 resource "aws_s3_bucket" "site" {
@@ -72,6 +88,32 @@ locals {
     s3_origin_id = "ToneS3Origin"
 }
 
+# Declare Domain Variable
+variable "root_domain_name" {
+    type       = string
+    default    = "tdh-resume.com"
+}
+
+resource "aws_route53_zone" "tdh-resume-zone" {
+    name = var.root_domain_name
+}
+# Creates an ACM Certificate
+resource "aws_acm_certificate" "tdh-resume-certificate" {
+    provider = "aws.acm"
+    domain_name = "${var.root_domain_name}"
+    subject_alternative_names = ["*.${var.root_domain_name}"]
+    validation_method = "DNS"
+    lifecycle {
+        create_before_destroy = true
+    }
+}
+resource "aws_route53_record" "tdh-cert-dns" {
+allow_overwrite = true
+name = tolist{aws_acm_certificate.tdh-resume-certificate.domain_validation_optiions}[0].resources_record_name
+
+}
+    
+
 resource "aws_cloudfront_distribution" "s3_distribution" {
     origin {
         domain_name                     = aws_s3_bucket.site.bucket_regional_domain_name
@@ -81,6 +123,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     is_ipv6_enabled = true
     comment = "Some comment"
     default_root_object = "index.html"
+
+    aliases = ["tdh-resume.com"]
 
 
     default_cache_behavior {
