@@ -65,8 +65,8 @@ resource "aws_s3_object" "site" {
     key          = "index.html"
     content_type = "text/html"
     acl          = "public-read"
-    source       = "C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html"
-    etag         = filemd5("C:/Users/tone.herndon/Git/Cloud-Resume-Project/Cloud-Resume-Project/index.html")
+    source       = "C:/Users/tone.herndon/Git/Cloud-Resume-Project/index.html"
+    etag         = filemd5("C:/Users/tone.herndon/Git/Cloud-Resume-Project/index.html")
 }
 locals {
     s3_origin_id = "ToneS3Origin"
