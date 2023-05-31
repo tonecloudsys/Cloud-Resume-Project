@@ -110,6 +110,7 @@ resource "aws_acm_certificate" "tdh-resume-certificate" {
 resource "aws_route53_record" "tdh-cert-dns" {
 allow_overwrite = true
 name = tolist{aws_acm_certificate.tdh-resume-certificate.domain_validation_optiions}[0].resources_record_name
+gf
 
 }
     
