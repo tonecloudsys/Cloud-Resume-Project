@@ -88,18 +88,13 @@ locals {
     s3_origin_id = "ToneS3Origin"
 }
 
-# Declare Domain Variable
-variable "root_domain_name" {
-    type       = string
-    default    = "tdh-resume.com"
-}
 
-resource "aws_route53_zone" "tdh-resume-zone" {
-    name = var.root_domain_name
+data "aws_route53_zone" "tdh-zone" {
+    name = "toneherndon.com"
 }
 # Creates an ACM Certificate
 resource "aws_acm_certificate" "tdh-resume-certificate" {
-    domain_name = var.root_domain_name
+    domain_name = "resume.toneherndon.com"
     validation_method = "DNS"
     lifecycle {
         create_before_destroy = true
@@ -110,7 +105,7 @@ allow_overwrite = true
 name = tolist(aws_acm_certificate.tdh-resume-certificate.domain_validation_options)[0].resource_record_name
 records = [tolist(aws_acm_certificate.tdh-resume-certificate.domain_validation_options)[0].resource_record_value]
 type = tolist(aws_acm_certificate.tdh-resume-certificate.domain_validation_options)[0].resource_record_type
-zone_id = aws_route53_zone.tdh-resume-zone.zone_id
+zone_id = data.aws_route53_zone.tdh-zone.zone_id
 ttl = 60
 }
 
@@ -125,8 +120,8 @@ resource "aws_route53_record" "cf-record" {
         aws_cloudfront_distribution.s3_distribution
     ]
 
-    zone_id = aws_route53_zone.tdh-resume-zone.zone_id
-    name = "tdh-resume.com"
+    zone_id = data.aws_route53_zone.tdh-zone.zone_id
+    name = "resume.toneherndon.com"
     type = "A"
     alias {
         name = aws_cloudfront_distribution.s3_distribution.domain_name
@@ -140,12 +135,13 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
         domain_name                     = aws_s3_bucket.site.bucket_regional_domain_name
         origin_id                       = local.s3_origin_id
     }
+    aliases = ["resume.toneherndon.com"]
+    
     enabled = true
     is_ipv6_enabled = true
     comment = "Some comment"
     default_root_object = "index.html"
 
-    aliases = ["tdh-resume.com"]
 
 
     default_cache_behavior {
@@ -185,6 +181,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
     viewer_certificate {
         acm_certificate_arn = aws_acm_certificate_validation.tdh-cert-validate.certificate_arn
+        ssl_support_method = "sni-only"
     }
 
 }
