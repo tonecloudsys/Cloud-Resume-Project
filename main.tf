@@ -9,6 +9,7 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
+    alias = "virginia"
     region  =  "us-east-1"
     profile = "tone.herndon.adm"
 }
