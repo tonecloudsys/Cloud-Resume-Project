@@ -16,7 +16,7 @@ provider "aws" {
 provider "aws" {
     alias = "acm"
     region = "us-east-1"
-    version = "2.11.18"
+    version = "5.0.1"
 }
 
 resource "aws_s3_bucket" "site" {
