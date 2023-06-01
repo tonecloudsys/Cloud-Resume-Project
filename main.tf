@@ -9,7 +9,6 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-    alias = "virginia"
     region  =  "us-east-1"
     profile = "tone.herndon.adm"
 }
@@ -100,7 +99,6 @@ resource "aws_route53_zone" "tdh-resume-zone" {
 }
 # Creates an ACM Certificate
 resource "aws_acm_certificate" "tdh-resume-certificate" {
-    provider = aws.virginia
     domain_name = var.root_domain_name
     validation_method = "DNS"
     lifecycle {
@@ -114,11 +112,9 @@ records = [tolist(aws_acm_certificate.tdh-resume-certificate.domain_validation_o
 type = tolist(aws_acm_certificate.tdh-resume-certificate.domain_validation_options)[0].resource_record_type
 zone_id = aws_route53_zone.tdh-resume-zone.zone_id
 ttl = 60
-provider = aws.virginia
 }
 
 resource "aws_acm_certificate_validation" "tdh-cert-validate" {
-    provider = aws.virginia
     certificate_arn = aws_acm_certificate.tdh-resume-certificate.arn
     validation_record_fqdns = [aws_route53_record.tdh-cert-dns.fqdn]
 }
@@ -137,7 +133,6 @@ resource "aws_route53_record" "cf-record" {
         zone_id = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
         evaluate_target_health = false
     }
-    provider = aws.virginia
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
